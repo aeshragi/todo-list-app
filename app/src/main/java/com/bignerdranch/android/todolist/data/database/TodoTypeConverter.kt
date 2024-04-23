@@ -6,13 +6,13 @@ import java.util.Date
 
 class TodoTypeConverter {
     @TypeConverter
-    fun fromDate(date: Date): Long {
-        return date.time
+    fun fromDate(date: Date?): Long {
+        return date?.time ?: -1
     }
 
     @TypeConverter
-    fun toDate(millisSinceEpoch: Long): Date {
-        return Date(millisSinceEpoch)
+    fun toDate(millisSinceEpoch: Long): Date? {
+        return if (millisSinceEpoch == -1L) null else Date(millisSinceEpoch)
     }
 
     @TypeConverters

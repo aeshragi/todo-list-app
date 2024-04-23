@@ -34,9 +34,11 @@ class TodoListViewModel : ViewModel() {
                     TodoSort.PRIORITY -> { oldState.todos.sortedBy { it.priority } }
                     TodoSort.DUE_DATE -> { oldState.todos.sortedBy { it.dateDue } }
                     TodoSort.DATE_CREATED -> { oldState.todos.sortedBy { it.dateCreated } }
-                }
+                },
+                todoSort = sort
             )
         }
+        toggleDropDown()
     }
 
     val uiState: StateFlow<ListUiState> get() = _uiState

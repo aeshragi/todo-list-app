@@ -42,7 +42,7 @@ fun TodoListScreen(
     Column {
         Box {
             OutlinedButton(onClick = { viewModel.toggleDropDown() }) {
-                Text(text = "Sort")
+                Text(text = "Sort by: ${uiState.todoSort}")
             }
             DropdownMenu(expanded = uiState.sortExpanded,
                 onDismissRequest = { viewModel.toggleDropDown() }) {
