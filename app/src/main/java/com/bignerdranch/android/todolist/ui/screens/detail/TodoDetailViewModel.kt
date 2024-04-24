@@ -12,6 +12,7 @@ import com.bignerdranch.android.todolist.data.database.TodoPriority
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +46,11 @@ class TodoDetailViewModel @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.coroutineContext.cancelChildren()
     }
 
     fun toggleDatePicker() {

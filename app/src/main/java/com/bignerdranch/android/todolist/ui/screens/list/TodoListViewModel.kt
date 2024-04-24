@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bignerdranch.android.todolist.data.TodoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -28,6 +29,11 @@ class TodoListViewModel @Inject constructor(private val todoRepository: TodoRepo
             val oldExpanded = oldState.sortExpanded
             oldState.copy(sortExpanded = !oldExpanded)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.coroutineContext.cancelChildren()
     }
 
     fun sortBy(sort: TodoSort) {

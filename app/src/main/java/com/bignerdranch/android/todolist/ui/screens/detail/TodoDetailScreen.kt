@@ -43,10 +43,11 @@ fun TodoDetailScreen(
     id: UUID?, onSubmitEditAdd: () -> Unit,
     todoDetailViewModelFactory: TodoDetailViewModel.Factory
 ) {
-    val viewModel: TodoDetailViewModel = viewModel(factory = TodoDetailViewModel.provideFactory(
-        todoDetailViewModelFactory,
-        id
-    )
+    val viewModel: TodoDetailViewModel = viewModel(
+        factory = TodoDetailViewModel.provideFactory(
+            todoDetailViewModelFactory,
+            id
+        )
     )
     val uiState: DetailUIState by viewModel.detailUiState.collectAsState()
     val datePickerState = rememberDatePickerState()
