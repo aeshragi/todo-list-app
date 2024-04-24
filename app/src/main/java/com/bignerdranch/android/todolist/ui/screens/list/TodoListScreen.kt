@@ -28,6 +28,8 @@ import com.bignerdranch.android.todolist.data.database.TodoPriority
 import java.time.LocalDateTime
 import java.util.UUID
 
+const val LIST_SCREEN_NAV = "TodoListScreen"
+
 @Composable
 fun TodoListScreen(
     addTodoClicked: () -> Unit,

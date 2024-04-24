@@ -34,6 +34,8 @@ import com.bignerdranch.android.todolist.app.utils.DateUtils.asDateEx
 import com.bignerdranch.android.todolist.data.database.TodoPriority
 import java.util.UUID
 
+const val TODO_DETAIL_SCREEN_NAV = "TodoDetailScreen"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
