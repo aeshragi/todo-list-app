@@ -6,6 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bignerdranch.android.todolist.ui.screens.detail.TodoDetailScreen
+import com.bignerdranch.android.todolist.ui.screens.detail.TodoDetailViewModel
+import com.bignerdranch.android.todolist.ui.screens.list.TodoListScreen
+import com.bignerdranch.android.todolist.ui.screens.list.TodoListViewModel
 import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)

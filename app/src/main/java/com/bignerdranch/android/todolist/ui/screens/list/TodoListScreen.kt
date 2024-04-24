@@ -1,4 +1,4 @@
-package com.bignerdranch.android.todolist.ui
+package com.bignerdranch.android.todolist.ui.screens.list
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -22,14 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bignerdranch.android.todolist.app.DateUtils
+import com.bignerdranch.android.todolist.app.utils.DateUtils
 import com.bignerdranch.android.todolist.data.database.Todo
 import com.bignerdranch.android.todolist.data.database.TodoPriority
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Date
 import java.util.UUID
 
 @Composable

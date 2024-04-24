@@ -1,4 +1,4 @@
-package com.bignerdranch.android.todolist.ui
+package com.bignerdranch.android.todolist.ui.screens.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

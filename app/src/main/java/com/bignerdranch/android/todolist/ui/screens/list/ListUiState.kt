@@ -1,4 +1,4 @@
-package com.bignerdranch.android.todolist.ui
+package com.bignerdranch.android.todolist.ui.screens.list
 
 import com.bignerdranch.android.todolist.data.database.Todo
 

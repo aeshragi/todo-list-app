@@ -1,4 +1,4 @@
-package com.bignerdranch.android.todolist.ui
+package com.bignerdranch.android.todolist.ui.screens.detail
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -29,12 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bignerdranch.android.todolist.app.DateUtils
-import com.bignerdranch.android.todolist.app.DateUtils.asDateEx
-import com.bignerdranch.android.todolist.data.TodoRepository
+import com.bignerdranch.android.todolist.app.utils.DateUtils
+import com.bignerdranch.android.todolist.app.utils.DateUtils.asDateEx
 import com.bignerdranch.android.todolist.data.database.TodoPriority
 import java.util.UUID
-import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -43,7 +41,11 @@ fun TodoDetailScreen(
     id: UUID?, onSubmitEditAdd: () -> Unit,
     todoDetailViewModelFactory: TodoDetailViewModel.Factory
 ) {
-    val viewModel: TodoDetailViewModel = viewModel(factory = TodoDetailViewModel.provideFactory(todoDetailViewModelFactory, id))
+    val viewModel: TodoDetailViewModel = viewModel(factory = TodoDetailViewModel.provideFactory(
+        todoDetailViewModelFactory,
+        id
+    )
+    )
     val uiState: DetailUIState by viewModel.detailUiState.collectAsState()
     val datePickerState = rememberDatePickerState()
     Column {

@@ -1,20 +1,17 @@
-package com.bignerdranch.android.todolist.ui
+package com.bignerdranch.android.todolist.ui.screens.detail
 
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.bignerdranch.android.todolist.app.DateUtils
+import com.bignerdranch.android.todolist.app.utils.DateUtils
 import com.bignerdranch.android.todolist.data.TodoRepository
 import com.bignerdranch.android.todolist.data.database.Todo
 import com.bignerdranch.android.todolist.data.database.TodoPriority
-import dagger.Module
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,4 +1,4 @@
-package com.bignerdranch.android.todolist.app
+package com.bignerdranch.android.todolist.app.utils
 
 import android.os.Build
 import androidx.annotation.RequiresApi
