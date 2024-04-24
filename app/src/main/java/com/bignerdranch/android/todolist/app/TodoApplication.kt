@@ -1,11 +1,7 @@
 package com.bignerdranch.android.todolist.app
 
 import android.app.Application
-import com.bignerdranch.android.todolist.data.TodoRepository
+import dagger.hilt.android.HiltAndroidApp
 
-class TodoApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        TodoRepository.initialize(this)
-    }
-}
+@HiltAndroidApp
+class TodoApplication : Application()

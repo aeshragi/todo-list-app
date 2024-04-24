@@ -34,9 +34,9 @@ import java.util.UUID
 
 @Composable
 fun TodoListScreen(
-    viewModel: TodoListViewModel = viewModel(),
     addTodoClicked: () -> Unit,
-    onEditTodoClicked: (UUID) -> Unit
+    onEditTodoClicked: (UUID) -> Unit,
+    viewModel: TodoListViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Column {

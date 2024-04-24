@@ -9,6 +9,12 @@ import com.bignerdranch.android.todolist.app.DateUtils
 import com.bignerdranch.android.todolist.data.TodoRepository
 import com.bignerdranch.android.todolist.data.database.Todo
 import com.bignerdranch.android.todolist.data.database.TodoPriority
+import dagger.Module
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityRetainedComponent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +26,10 @@ import java.util.Date
 import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
-class TodoDetailViewModel(todoId: UUID?) : ViewModel() {
+class TodoDetailViewModel @AssistedInject constructor(
+    @Assisted todoId: UUID?,
+    private val todoRepository: TodoRepository
+) : ViewModel() {
 
     private val _detailUiState: MutableStateFlow<DetailUIState> = MutableStateFlow(
         DetailUIState(
@@ -34,7 +43,7 @@ class TodoDetailViewModel(todoId: UUID?) : ViewModel() {
     init {
         viewModelScope.launch {
             todoId?.let {
-                TodoRepository.get().getTodo(it).collect { todo ->
+                todoRepository.getTodo(it).collect { todo ->
                     _detailUiState.update { state -> state.copy(databaseTodo = todo) }
                 }
             }
@@ -42,7 +51,7 @@ class TodoDetailViewModel(todoId: UUID?) : ViewModel() {
     }
 
     fun toggleDatePicker() {
-        _detailUiState.update {oldState ->
+        _detailUiState.update { oldState ->
             val prevDatePicker = oldState.showDatePicker
             oldState.copy(showDatePicker = !prevDatePicker)
         }
@@ -51,17 +60,23 @@ class TodoDetailViewModel(todoId: UUID?) : ViewModel() {
     fun upsert(todo: Todo) {
         val updatedTodo = todo.copy(dateCreated = DateUtils.asDate(LocalDateTime.now()))
         viewModelScope.launch {
-            val existingTodo = TodoRepository.get().getTodo(todo.id).firstOrNull()
+            val existingTodo = todoRepository.getTodo(todo.id).firstOrNull()
             if (existingTodo != null) {
-                TodoRepository.get().updateTodo(updatedTodo)
+                todoRepository.updateTodo(updatedTodo)
             } else {
-                TodoRepository.get().addTodo(updatedTodo)
+                todoRepository.addTodo(updatedTodo)
             }
         }
     }
 
     fun updateDueDate(date: Date) {
-        _detailUiState.update { oldState -> oldState.copy(databaseTodo = oldState.databaseTodo.copy(dateDue = date), showDueDate = true)}
+        _detailUiState.update { oldState ->
+            oldState.copy(
+                databaseTodo = oldState.databaseTodo.copy(
+                    dateDue = date
+                ), showDueDate = true
+            )
+        }
     }
 
     fun updateTitle(title: String) {
@@ -87,11 +102,21 @@ class TodoDetailViewModel(todoId: UUID?) : ViewModel() {
     fun updateCheck(check: Boolean) {
         _detailUiState.update { it.copy(databaseTodo = it.databaseTodo.copy(isDone = check)) }
     }
-}
 
-class TodoDetailViewModelFactory(private val uuid: UUID?) : ViewModelProvider.Factory {
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return TodoDetailViewModel(uuid) as T
+    @AssistedFactory
+    interface Factory {
+        fun create(uuid: UUID?): TodoDetailViewModel
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    companion object {
+        fun provideFactory(
+            assistedFactory: Factory,
+            uuid: UUID?
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return assistedFactory.create(uuid) as T
+            }
+        }
     }
 }
