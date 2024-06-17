@@ -16,6 +16,7 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,19 +30,13 @@ class TodoDetailViewModel @AssistedInject constructor(
     private val todoRepository: TodoRepository
 ) : ViewModel() {
 
-    private val _detailUiState: MutableStateFlow<DetailUIState> = MutableStateFlow(
-        DetailUIState(
-            databaseTodo = Todo(
-                id = UUID.randomUUID(), title = "", content = "", isDone = false,
-            )
-        )
-    )
+    private val _detailUiState: MutableStateFlow<DetailUIState> = MutableStateFlow(DetailUIState())
     val detailUiState: StateFlow<DetailUIState> = _detailUiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             todoId?.let {
-                todoRepository.getTodo(it).collect { todo ->
+                todoRepository.getTodo(it).collectLatest { todo ->
                     _detailUiState.update { state -> state.copy(databaseTodo = todo) }
                 }
             }
@@ -75,20 +70,29 @@ class TodoDetailViewModel @AssistedInject constructor(
     fun updateDueDate(date: Date) {
         _detailUiState.update { oldState ->
             oldState.copy(
-                databaseTodo = oldState.databaseTodo.copy(
+                databaseTodo = oldState.databaseTodo?.copy(
                     dateDue = date
                 ), showDueDate = true
             )
         }
     }
 
+    private suspend fun updateDatabaseTodo(todo: Todo) { todoRepository.updateTodo(todo) }
+
     fun updateTitle(title: String) {
-        _detailUiState.update { it.copy(databaseTodo = it.databaseTodo.copy(title = title)) }
+        viewModelScope.launch {
+            _detailUiState.update { it.copy(databaseTodo = it.databaseTodo?.copy(title = title)) }
+            updateDatabaseTodo(_detailUiState.value.databaseTodo!!)
+        }
+
     }
 
     fun updatePriority(priority: TodoPriority) {
-        _detailUiState.update { it.copy(databaseTodo = it.databaseTodo.copy(priority = priority)) }
-        togglePriorityMenu()
+        viewModelScope.launch {
+            _detailUiState.update { it.copy(databaseTodo = it.databaseTodo?.copy(priority = priority)) }
+            updateDatabaseTodo(_detailUiState.value.databaseTodo!!)
+            togglePriorityMenu()
+        }
     }
 
     fun togglePriorityMenu() {
@@ -99,11 +103,17 @@ class TodoDetailViewModel @AssistedInject constructor(
     }
 
     fun updateContent(content: String) {
-        _detailUiState.update { it.copy(databaseTodo = it.databaseTodo.copy(content = content)) }
+        viewModelScope.launch {
+            _detailUiState.update { it.copy(databaseTodo = it.databaseTodo?.copy(content = content)) }
+            updateDatabaseTodo(_detailUiState.value.databaseTodo!!)
+        }
     }
 
     fun updateCheck(check: Boolean) {
-        _detailUiState.update { it.copy(databaseTodo = it.databaseTodo.copy(isDone = check)) }
+        viewModelScope.launch {
+            _detailUiState.update { it.copy(databaseTodo = it.databaseTodo?.copy(isDone = check)) }
+            updateDatabaseTodo(_detailUiState.value.databaseTodo!!)
+        }
     }
 
     @AssistedFactory

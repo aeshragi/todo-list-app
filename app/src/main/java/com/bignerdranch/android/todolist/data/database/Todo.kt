@@ -1,7 +1,10 @@
 package com.bignerdranch.android.todolist.data.database
 
+import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.bignerdranch.android.todolist.ui.screens.list.COLOR_DARK_GREEN
+import com.bignerdranch.android.todolist.ui.screens.list.COLOR_ORANGE
 import java.util.Date
 import java.util.UUID
 
@@ -13,6 +16,16 @@ enum class TodoPriority(val value: Int) {
     P4(4);
     companion object {
         fun fromInt(value: Int) = TodoPriority.values().first { it.value == value }
+    }
+
+    fun toColor(): Color {
+        return when (this) {
+            P0 -> Color.Red
+            P1 -> COLOR_ORANGE
+            P2 -> Color.Yellow
+            P3 -> COLOR_DARK_GREEN
+            P4 -> Color.LightGray
+        }
     }
 }
 

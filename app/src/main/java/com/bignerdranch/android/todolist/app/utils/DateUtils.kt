@@ -10,6 +10,10 @@ import java.util.Date
 
 @RequiresApi(Build.VERSION_CODES.O)
 object DateUtils {
+    private val months: List<String> = listOf("Jan", "Feb", "Mar", "Apr", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+    fun Int.toMonth() = months[this]
+
     fun convertMillisToLocalDate(millis: Long) : LocalDate {
         return Instant
             .ofEpochMilli(millis)
