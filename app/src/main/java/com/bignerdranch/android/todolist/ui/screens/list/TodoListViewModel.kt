@@ -3,6 +3,7 @@ package com.bignerdranch.android.todolist.ui.screens.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bignerdranch.android.todolist.data.TodoRepository
+import com.bignerdranch.android.todolist.data.cache.TodoPreferenceRepository
 import com.bignerdranch.android.todolist.data.database.Todo
 import com.bignerdranch.android.todolist.ui.screens.list.TodoSort.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class TodoListViewModel @Inject constructor(private val todoRepository: TodoRepository) :
+class TodoListViewModel @Inject constructor(private val todoRepository: TodoRepository,
+    private val todoPreferenceRepository: TodoPreferenceRepository) :
     ViewModel() {
     private val _uiState: MutableStateFlow<ListUiState> =
         MutableStateFlow(ListUiState(todos = emptyList()))
@@ -26,8 +28,9 @@ class TodoListViewModel @Inject constructor(private val todoRepository: TodoRepo
     init {
         viewModelScope.launch {
             todoRepository.getTodos().stateIn(viewModelScope).collectLatest { todos ->
-                // TODO add a cache for sorting and completed preferences
-                _uiState.update { state -> state.copy(todos = todos.sortBy(uiState.value.todoSort)) }
+                todoPreferenceRepository.storedQuery.collectLatest {
+                    _uiState.update { state -> state.copy(todos = todos.sortBy(it), todoSort = it) }
+                }
             }
         }
     }
@@ -87,6 +90,9 @@ class TodoListViewModel @Inject constructor(private val todoRepository: TodoRepo
                 },
                 todoSort = sort
             )
+        }
+        viewModelScope.launch {
+            todoPreferenceRepository.setStoredQuery(sort)
         }
         toggleDropDown()
     }
