@@ -20,4 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "TodoList"
-include(":app")
+include(":androidApp")
+include(":shared")
