@@ -10,28 +10,52 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class TodoListViewModel @Inject constructor(private val todoRepository: TodoRepository,
-    private val todoPreferenceRepository: TodoPreferenceRepository) :
+class TodoListViewModel @Inject constructor(
+    private val todoRepository: TodoRepository,
+    private val todoPreferenceRepository: TodoPreferenceRepository
+) :
     ViewModel() {
     private val _uiState: MutableStateFlow<ListUiState> =
         MutableStateFlow(ListUiState(todos = emptyList()))
 
     init {
         viewModelScope.launch {
-            todoRepository.getTodos().stateIn(viewModelScope).collectLatest { todos ->
-                todoPreferenceRepository.storedQuery.collectLatest {
-                    _uiState.update { state -> state.copy(todos = todos.sortBy(it), todoSort = it) }
+            combine(
+                todoRepository.getTodos(),
+                todoPreferenceRepository.storedQuery,
+                todoPreferenceRepository.showCompleted
+            ) { todos, query, showCompleted ->
+                _uiState.update { state ->
+                    state.copy(
+                        todos = todos.sortBy(query).filter {
+                            if (!showCompleted) {
+                                !it.isDone
+                            } else {
+                                true
+                            }
+                        },
+                        todoSort = query,
+                        showCompleted = showCompleted
+                    )
                 }
-            }
+            }.collect()
+        }
+    }
+
+    fun toggleShowCompleted() {
+        _uiState.update { old ->
+            old.copy(showCompleted = !old.showCompleted)
+        }
+        viewModelScope.launch {
+            todoPreferenceRepository.setShowCompleted(_uiState.value.showCompleted)
         }
     }
 
@@ -64,11 +88,14 @@ class TodoListViewModel @Inject constructor(private val todoRepository: TodoRepo
         viewModelScope.coroutineContext.cancelChildren()
     }
 
-    fun List<Todo>.sortBy(sort: TodoSort): List<Todo> {
+    private fun List<Todo>.sortBy(sort: TodoSort): List<Todo> {
+        val doneList = filter { it.isDone }
+        val unDone = filter { !it.isDone }
+
         return when (sort) {
-            PRIORITY -> sortedBy { it.priority }
-            DUE_DATE -> sortedBy { it.dateDue }
-            DATE_CREATED -> sortedBy { it.dateCreated }
+            PRIORITY -> unDone.sortedBy { it.priority } + doneList.sortedBy { it.priority }
+            DUE_DATE -> unDone.sortedBy { it.dateDue } + doneList.sortedBy { it.dateDue }
+            DATE_CREATED -> unDone.sortedBy { it.dateCreated } + doneList.sortedBy { it.dateCreated }
         }
     }
 

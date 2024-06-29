@@ -88,8 +88,8 @@ fun TodoDetailBottomSheet(
     val uiState: DetailUIState by viewModel.detailUiState.collectAsState()
     ModalBottomSheet(
         onDismissRequest = onDismissBottomSheet,
-        modifier = Modifier.fillMaxHeight(),
-        containerColor = DIALOG_COLOR
+        modifier = Modifier.fillMaxHeight(0.9f),
+        containerColor = DIALOG_COLOR,
     ) {
         uiState.databaseTodo?.let {
             ExistingTodo(
@@ -217,6 +217,7 @@ fun TodoTextField(
 ) {
     OutlinedTextField(value = text,
         colors = TextFieldDefaults.colors(
+            focusedTextColor = Color.Black,
             focusedContainerColor = DIALOG_COLOR,
             unfocusedContainerColor = DIALOG_COLOR,
             focusedIndicatorColor = DIALOG_COLOR,
@@ -244,18 +245,13 @@ fun NewTodo(
     var dueDate: Date? by remember { mutableStateOf(null) }
     var priority: TodoPriority by remember { mutableStateOf(TodoPriority.P4) }
     //var showDatePicker: Boolean by remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
     Column(horizontalAlignment = Alignment.Start) {
         TodoTextField(
             text = title,
             onValueChanged = { title = it },
             textStyle = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.focusRequester(focusRequester),
             placeHolder = { Text(text = "Task Name", fontSize = 20.sp) }
         )
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
-        }
         TodoTextField(
             text = content,
             onValueChanged = { content = it },

@@ -72,19 +72,26 @@ fun TodoListScreen(
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
     Column {
-        Box {
-            OutlinedButton(onClick = { viewModel.toggleDropDown() }) {
-                Text(text = "Sort by: ${uiState.todoSort}")
-            }
-            DropdownMenu(expanded = uiState.sortExpanded,
-                onDismissRequest = { viewModel.toggleDropDown() }) {
-                TodoSort.entries.forEach {
-                    DropdownMenuItem(
-                        text = { Text(text = it.name) },
-                        onClick = { viewModel.sortBy(it) })
+        Row {
+            Box {
+                OutlinedButton(onClick = { viewModel.toggleDropDown() }) {
+                    Text(text = "Sort by: ${uiState.todoSort}")
+                }
+                DropdownMenu(expanded = uiState.sortExpanded,
+                    onDismissRequest = { viewModel.toggleDropDown() }) {
+                    TodoSort.entries.forEach {
+                        DropdownMenuItem(
+                            text = { Text(text = it.name) },
+                            onClick = { viewModel.sortBy(it) })
+                    }
                 }
             }
+            Spacer(modifier = Modifier.width(10.dp))
+            OutlinedButton(onClick = { viewModel.toggleShowCompleted() }) {
+                Text(text = if (uiState.showCompleted) "hide completed" else "Show completed")
+            }
         }
+
         LazyColumn {
             items(uiState.todos) { todo ->
                 TodoItem(todo = todo,
@@ -188,7 +195,8 @@ fun AddTaskCard(onClick: () -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 5.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { onClick() },
         colors = cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp, pressedElevation = 1.dp)
     ) {
